@@ -1,0 +1,148 @@
+openapi: 3.1.0
+info:
+  title: Ecom API
+  description: API for Logan's ecommerce project
+  version: 0.1.9
+paths:
+  /products:
+    get:
+      summary: Returns a list of products
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductList'
+        404:
+          description: No products found
+        default:
+          description: Unexpected error
+    post:
+      summary: Creates a new product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductForm'
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        default:
+          description: Unexpected error
+  /products/new:
+    get:
+      summary: Returns a list new products
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductList'
+        404:
+          description: No products found
+        default:
+          description: Unexpected error
+  /products/{productId}:
+    get:
+      summary: Returns the specified product
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: integer
+          description: ID of the product to get
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        404:
+          description: No product found
+        default:
+          description: Unexpected error
+  /categories:
+    get:
+      summary: Returns a list of categories
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryList'
+        404:
+          description: No categories found
+        default:
+          description: Unexpected error
+  /categories/{categoryId}:
+    get:
+      summary: Returns the specified category
+      parameters:
+        - in: path
+          name: categoryId
+          required: true
+          schema:
+            type: integer
+          description: ID of the category to get
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        404:
+          description: No category found
+        default:
+          description: Unexpected error
+components:
+  schemas:
+    ProductList:
+      type: Array
+      items:
+        $ref: '#/components/schemas/Product'
+    Product:
+      type: Object
+      properties:
+        productId:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        releaseDate:
+          type: string
+        categories:
+          type: Array
+          items:
+            $ref: '#/components/schemas/Category'
+    ProductForm:
+      type: Object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        releaseDate:
+          type: string
+    CategoryList:
+      type: Array
+      items:
+        $ref: '#/components/schemas/Category'
+    Category:
+      type: Object
+      properties:
+        categoryId:
+          type: integer
+        name:
+          type: string
