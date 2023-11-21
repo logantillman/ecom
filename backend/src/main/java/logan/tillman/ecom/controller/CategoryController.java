@@ -23,7 +23,7 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    // Get all categories
+    // TODO change to only include names/id
     @GetMapping("/categories")
     public ResponseEntity<List<CategoryDTO>> getCategories() {
         var categories = categoryService.getAllCategories();
@@ -35,13 +35,11 @@ public class CategoryController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    // Create category
     @PostMapping("/categories")
     public ResponseEntity<CategoryDTO> createCategory(@RequestBody CategoryDTO categoryDTO) {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    // Get category details
     @GetMapping("/categories/{categoryId}")
     public ResponseEntity<CategoryDTO> getCategory(@PathVariable Integer categoryId) {
         var category = categoryService.getCategory(categoryId);
@@ -52,7 +50,6 @@ public class CategoryController {
 
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-
 
 
     // Update category

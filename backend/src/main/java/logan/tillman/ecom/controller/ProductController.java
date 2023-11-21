@@ -26,17 +26,6 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @GetMapping("/products")
-    public ResponseEntity<List<ProductDTO>> getProducts() {
-        var products = productService.getAllProducts();
-
-        if (!products.isEmpty()) {
-            return new ResponseEntity<>(products, HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
     @PostMapping("/products")
     public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO productDTO) {
         var product = productService.createProduct(productDTO);
@@ -46,18 +35,6 @@ public class ProductController {
         }
 
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    }
-
-    @GetMapping("/products/new")
-    public ResponseEntity<List<ProductDTO>> getNewProducts() {
-        log.info("Getting new products");
-        var products = productService.getNewProducts();
-
-        if (!products.isEmpty()) {
-            return new ResponseEntity<>(products, HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/products/{productId}")
@@ -72,13 +49,13 @@ public class ProductController {
     }
 
     @PutMapping("/products/{productId}")
-    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Integer productId, @RequestBody ProductDTO productDTO) {
-        var product = productService.updateProduct(productId, productDTO);
+    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Integer productId, @RequestBody Product product) {
+        var updatedProduct = productService.updateProduct(productId, product);
 
-        if (product != null) {
-            return new ResponseEntity<>(product, HttpStatus.OK);
+        if (updatedProduct != null) {
+            return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
         }
 
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // TODO: Might want to add better messaging here
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 }

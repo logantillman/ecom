@@ -22,24 +22,6 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    public List<ProductDTO> getAllProducts() {
-        log.info("Getting all products");
-        var products = productRepository.findAll();
-
-        return products.stream().map(this::mapToProductDTO).collect(Collectors.toList());
-    }
-
-    public List<ProductDTO> getNewProducts() {
-        var startDate = OffsetDateTime.now().minusWeeks(1);
-        var endDate = OffsetDateTime.now();
-
-        var products = productRepository.findByReleaseDateBetween(startDate, endDate);
-
-        log.info("Found {} new products between {} and {}", products.size(), startDate, endDate);
-
-        return products.stream().map(this::mapToProductDTO).collect(Collectors.toList());
-    }
-
     public ProductDTO createProduct(ProductDTO productDTO) {
         if (productDTO.getTitle() == null || productDTO.getTitle().isEmpty()) {
             log.error("Unable to create product with empty title");
@@ -66,15 +48,21 @@ public class ProductService {
         }
     }
 
-    public ProductDTO updateProduct(Integer productId, ProductDTO productDTO) {
+    public ProductDTO updateProduct(Integer productId, Product productToUpdate) {
         var existingProduct = productRepository.findById(productId);
 
         if (existingProduct.isPresent()) {
             var updatedProduct = existingProduct.map(product -> {
-                product.setTitle(productDTO.getTitle());
-                product.setDescription(productDTO.getDescription());
-                product.setReleaseDate(productDTO.getReleaseDate());
-//                product.setCategories(productDTO.getCategories()); TODO figure this one out
+                product.setTitle(productToUpdate.getTitle());
+                product.setDescription(productToUpdate.getDescription());
+                product.setReleaseDate(productToUpdate.getReleaseDate());
+
+//                var currentCategoriesMap = product.getCategories().stream()
+//                        .collect(Collectors.toMap(Category::getCategoryId, category -> category));
+//                var modifiedCategories = productDTO.getCategories().stream()
+//                        .filter(category -> )
+                product.setCategories(product.getCategories()); // TODO do testing
+
                 return productRepository.save(product);
             });
             return mapToProductDTO(updatedProduct.get());
