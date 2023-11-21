@@ -70,6 +70,32 @@ paths:
           description: No product found
         default:
           description: Unexpected error
+    put:
+      summary: Updated the specified product
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: integer
+          description: ID of the product to get
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductForm'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        404:
+          description: No product found
+        default:
+          description: Unexpected error
   /categories:
     get:
       summary: Returns a list of categories
