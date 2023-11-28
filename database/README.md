@@ -2,4 +2,4 @@ Using a simple Postgres database for local development, and Supabase for product
 
 Table Models:
 
-![ecom table models](table models.png)
+<a href="url"><img src="table models.png" align="center"></a>
