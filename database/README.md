@@ -2,4 +2,4 @@ Using a simple Postgres database for local development, and Supabase for product
 
 Table Models:
 
-<a href="url"><img src="table models.png" align="center"></a>
+<img src="table models.png" align="center">
