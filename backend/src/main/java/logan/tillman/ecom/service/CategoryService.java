@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -21,7 +20,7 @@ public class CategoryService {
 
     public List<CategoryDTO> getAllCategories() {
         var categories = categoryRepository.findAll();
-        return categories.stream().map(this::mapToCategoryDTO).collect(Collectors.toList());
+        return categories.stream().map(this::mapToCategoryDTO).toList();
     }
 
     public CategoryDTO getCategory(Integer categoryId) {

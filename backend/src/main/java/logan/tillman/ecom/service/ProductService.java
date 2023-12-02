@@ -83,7 +83,7 @@ public class ProductService {
     private ProductDTO mapToProductDTO(Product product) {
         List<CategoryDTO> categories = null;
         if (product.getCategories() != null) {
-            categories = product.getCategories().stream().map(this::mapToCategoryDTO).collect(Collectors.toList());
+            categories = product.getCategories().stream().map(this::mapToCategoryDTO).toList();
         }
 
         return ProductDTO.builder()
