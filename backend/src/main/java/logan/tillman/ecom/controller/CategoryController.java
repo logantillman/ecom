@@ -23,7 +23,6 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    // TODO change to only include names/id
     @GetMapping("/categories")
     public ResponseEntity<List<CategoryDTO>> getCategories() {
         var categories = categoryService.getAllCategories();
