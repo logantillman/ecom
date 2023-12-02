@@ -2,7 +2,6 @@ package logan.tillman.ecom.controller;
 
 
 import logan.tillman.ecom.dto.ProductDTO;
-import logan.tillman.ecom.entity.Product;
 import logan.tillman.ecom.service.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -49,7 +48,7 @@ public class ProductController {
     }
 
     @PutMapping("/products/{productId}")
-    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Integer productId, @RequestBody Product product) {
+    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Integer productId, @RequestBody ProductDTO product) {
         var updatedProduct = productService.updateProduct(productId, product);
 
         if (updatedProduct != null) {

@@ -134,6 +134,10 @@ components:
           type: string
         releaseDate:
           type: string
+        categories:
+          type: Array
+          items:
+            $ref: '#/components/schemas/Category'
     CategoryList:
       type: Array
       items:

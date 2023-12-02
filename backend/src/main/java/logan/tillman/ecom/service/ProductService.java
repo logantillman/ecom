@@ -1,5 +1,6 @@
 package logan.tillman.ecom.service;
 
+import logan.tillman.ecom.dao.CategoryRepository;
 import logan.tillman.ecom.dao.ProductRepository;
 import logan.tillman.ecom.dto.CategoryDTO;
 import logan.tillman.ecom.dto.ProductDTO;
@@ -7,8 +8,8 @@ import logan.tillman.ecom.entity.Category;
 import logan.tillman.ecom.entity.Product;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,9 +18,12 @@ import java.util.stream.Collectors;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository,
+                          CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     public ProductDTO createProduct(ProductDTO productDTO) {
@@ -48,24 +52,28 @@ public class ProductService {
         }
     }
 
-    public ProductDTO updateProduct(Integer productId, Product productToUpdate) {
-        var existingProduct = productRepository.findById(productId);
+    @Transactional(rollbackFor = Exception.class)
+    public ProductDTO updateProduct(Integer productId, ProductDTO updatedProduct) {
+        var optionalProduct = productRepository.findById(productId);
 
-        if (existingProduct.isPresent()) {
-            var updatedProduct = existingProduct.map(product -> {
-                product.setTitle(productToUpdate.getTitle());
-                product.setDescription(productToUpdate.getDescription());
-                product.setReleaseDate(productToUpdate.getReleaseDate());
+        if (optionalProduct.isPresent()) {
+            log.info("Updating product with id {}", productId);
+            var product = optionalProduct.get();
 
-//                var currentCategoriesMap = product.getCategories().stream()
-//                        .collect(Collectors.toMap(Category::getCategoryId, category -> category));
-//                var modifiedCategories = productDTO.getCategories().stream()
-//                        .filter(category -> )
-                product.setCategories(product.getCategories()); // TODO do testing
+            product.setTitle(updatedProduct.getTitle());
+            product.setDescription(updatedProduct.getDescription());
+            product.setReleaseDate(updatedProduct.getReleaseDate());
 
-                return productRepository.save(product);
-            });
-            return mapToProductDTO(updatedProduct.get());
+            var categoryToUpdateIds = updatedProduct.getCategories()
+                    .stream()
+                    .map(CategoryDTO::getCategoryId)
+                    .collect(Collectors.toSet());
+
+            var categories = categoryRepository.findAllById(categoryToUpdateIds);
+            product.setCategories(categories);
+            productRepository.saveAndFlush(product);
+
+            return mapToProductDTO(product);
         } else {
             log.info("Unable to find product with id {}", productId);
             return null;
