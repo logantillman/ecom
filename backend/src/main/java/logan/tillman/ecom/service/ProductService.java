@@ -54,6 +54,11 @@ public class ProductService {
 
     @Transactional(rollbackFor = Exception.class)
     public ProductDTO updateProduct(Integer productId, ProductDTO updatedProduct) {
+        if (updatedProduct.getTitle() == null || updatedProduct.getTitle().isEmpty()) {
+            log.error("Unable to update product to have empty title");
+            return null;
+        }
+
         var optionalProduct = productRepository.findById(productId);
 
         if (optionalProduct.isPresent()) {
