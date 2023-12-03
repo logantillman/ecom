@@ -34,6 +34,42 @@ public class CategoryService {
         }
     }
 
+    public CategoryDTO createCategory(CategoryDTO categoryDTO) {
+        if (categoryDTO.getName() == null || categoryDTO.getName().isEmpty()) {
+            log.error("Unable to create category with empty name");
+            return null;
+        }
+
+        var category = Category.builder()
+                .name(categoryDTO.getName())
+                .build();
+
+        return mapToCategoryDTO(categoryRepository.saveAndFlush(category));
+    }
+
+    public CategoryDTO updateCategory(Integer categoryId, CategoryDTO categoryDTO) {
+        if (categoryDTO.getName() == null || categoryDTO.getName().isEmpty()) {
+            log.error("Unable to update category to have empty name");
+            return null;
+        }
+
+        var optionalCategory = categoryRepository.findById(categoryId);
+
+        if (optionalCategory.isPresent()) {
+            log.info("Updating category with id {}", categoryId);
+            var category = optionalCategory.get();
+
+            category.setName(categoryDTO.getName());
+
+            categoryRepository.saveAndFlush(category);
+
+            return mapToCategoryDTO(category);
+        } else {
+            log.info("Unable to find category with id {}", categoryId);
+            return null;
+        }
+    }
+
     private CategoryDTO mapToCategoryDTO(Category category) {
         return CategoryDTO.builder()
                 .categoryId(category.getCategoryId())

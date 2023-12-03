@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,7 +37,13 @@ public class CategoryController {
 
     @PostMapping("/categories")
     public ResponseEntity<CategoryDTO> createCategory(@RequestBody CategoryDTO categoryDTO) {
-        return new ResponseEntity<>(HttpStatus.OK);
+        var category = categoryService.createCategory(categoryDTO);
+
+        if (category != null) {
+            return new ResponseEntity<>(category, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping("/categories/{categoryId}")
@@ -51,5 +58,14 @@ public class CategoryController {
     }
 
 
-    // Update category
+    @PutMapping("/categories/{categoryId}")
+    public ResponseEntity<CategoryDTO> updateCategory(@PathVariable Integer categoryId, @RequestBody CategoryDTO categoryDTO) {
+        var updatedCategory = categoryService.updateCategory(categoryId, categoryDTO);
+
+        if (updatedCategory != null) {
+            return new ResponseEntity<>(updatedCategory, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
 }
