@@ -7,6 +7,8 @@ paths:
   /products:
     post:
       summary: Creates a new product
+      tags:
+        - products
       requestBody:
         required: true
         content:
@@ -25,6 +27,8 @@ paths:
   /products/{productId}:
     get:
       summary: Returns the specified product
+      tags:
+        - products
       parameters:
         - in: path
           name: productId
@@ -45,6 +49,8 @@ paths:
           description: Unexpected error
     put:
       summary: Updated the specified product
+      tags:
+        - products
       parameters:
         - in: path
           name: productId
@@ -72,6 +78,8 @@ paths:
   /categories:
     get:
       summary: Returns a list of categories
+      tags:
+        - categories
       responses:
         200:
           description: OK
@@ -83,9 +91,30 @@ paths:
           description: No categories found
         default:
           description: Unexpected error
+    post:
+      summary: Creates a new category
+      tags:
+        - categories
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryForm'
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        default:
+          description: Unexpected error
   /categories/{categoryId}:
     get:
       summary: Returns the specified category
+      tags:
+        - categories
       parameters:
         - in: path
           name: categoryId
@@ -102,6 +131,34 @@ paths:
                 $ref: '#/components/schemas/Category'
         404:
           description: No category found
+        default:
+          description: Unexpected error
+    put:
+      summary: Updated the specified category
+      tags:
+        - categories
+      parameters:
+        - in: path
+          name: categoryId
+          required: true
+          schema:
+            type: integer
+          description: ID of the category to get
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryForm'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        404:
+          description: No product found
         default:
           description: Unexpected error
 components:
@@ -147,5 +204,10 @@ components:
       properties:
         categoryId:
           type: integer
+        name:
+          type: string
+    CategoryForm:
+      type: Object
+      properties:
         name:
           type: string
