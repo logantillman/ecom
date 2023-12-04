@@ -3,6 +3,7 @@ package logan.tillman.ecom.service;
 import logan.tillman.ecom.dao.CategoryRepository;
 import logan.tillman.ecom.dto.CategoryDTO;
 import logan.tillman.ecom.entity.Category;
+import logan.tillman.ecom.mapper.DtoMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -13,21 +14,24 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final DtoMapper dtoMapper;
 
-    public CategoryService(CategoryRepository categoryRepository) {
+    public CategoryService(CategoryRepository categoryRepository,
+                           DtoMapper dtoMapper) {
         this.categoryRepository = categoryRepository;
+        this.dtoMapper = dtoMapper;
     }
 
     public List<CategoryDTO> getAllCategories() {
         var categories = categoryRepository.findAll();
-        return categories.stream().map(this::mapToCategoryDTO).toList();
+        return categories.stream().map(dtoMapper::mapToCategoryDTO).toList();
     }
 
     public CategoryDTO getCategory(Integer categoryId) {
         var category = categoryRepository.findById(categoryId);
 
         if (category.isPresent()) {
-            return mapToCategoryDTO(category.get());
+            return dtoMapper.mapToCategoryDTO(category.get());
         } else {
             log.info("Unable to find product with id {}", categoryId);
             return null;
@@ -44,7 +48,7 @@ public class CategoryService {
                 .name(categoryDTO.getName())
                 .build();
 
-        return mapToCategoryDTO(categoryRepository.saveAndFlush(category));
+        return dtoMapper.mapToCategoryDTO(categoryRepository.saveAndFlush(category));
     }
 
     public CategoryDTO updateCategory(Integer categoryId, CategoryDTO categoryDTO) {
@@ -63,17 +67,10 @@ public class CategoryService {
 
             categoryRepository.saveAndFlush(category);
 
-            return mapToCategoryDTO(category);
+            return dtoMapper.mapToCategoryDTO(category);
         } else {
             log.info("Unable to find category with id {}", categoryId);
             return null;
         }
-    }
-
-    private CategoryDTO mapToCategoryDTO(Category category) {
-        return CategoryDTO.builder()
-                .categoryId(category.getCategoryId())
-                .name(category.getName())
-                .build();
     }
 }

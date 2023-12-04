@@ -4,13 +4,12 @@ import logan.tillman.ecom.dao.CategoryRepository;
 import logan.tillman.ecom.dao.ProductRepository;
 import logan.tillman.ecom.dto.CategoryDTO;
 import logan.tillman.ecom.dto.ProductDTO;
-import logan.tillman.ecom.entity.Category;
 import logan.tillman.ecom.entity.Product;
+import logan.tillman.ecom.mapper.DtoMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -19,11 +18,14 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final DtoMapper dtoMapper;
 
     public ProductService(ProductRepository productRepository,
-                          CategoryRepository categoryRepository) {
+                          CategoryRepository categoryRepository,
+                          DtoMapper dtoMapper) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.dtoMapper = dtoMapper;
     }
 
     public ProductDTO createProduct(ProductDTO productDTO) {
@@ -37,7 +39,7 @@ public class ProductService {
                 .description(productDTO.getDescription())
                 .releaseDate(productDTO.getReleaseDate())
                 .build();
-        return mapToProductDTO(productRepository.saveAndFlush(product));
+        return dtoMapper.mapToProductDTO(productRepository.saveAndFlush(product));
     }
 
     public ProductDTO getProduct(Integer productId) {
@@ -45,7 +47,7 @@ public class ProductService {
         var product = productRepository.findById(productId);
 
         if (product.isPresent()) {
-            return mapToProductDTO(product.get());
+            return dtoMapper.mapToProductDTO(product.get());
         } else {
             log.info("Unable to find product with id {}", productId);
             return null;
@@ -78,32 +80,10 @@ public class ProductService {
             product.setCategories(categories);
             productRepository.saveAndFlush(product);
 
-            return mapToProductDTO(product);
+            return dtoMapper.mapToProductDTO(product);
         } else {
             log.info("Unable to find product with id {}", productId);
             return null;
         }
-    }
-
-    private ProductDTO mapToProductDTO(Product product) {
-        List<CategoryDTO> categories = null;
-        if (product.getCategories() != null) {
-            categories = product.getCategories().stream().map(this::mapToCategoryDTO).toList();
-        }
-
-        return ProductDTO.builder()
-                .productId(product.getProductId())
-                .title(product.getTitle())
-                .description(product.getDescription())
-                .releaseDate(product.getReleaseDate())
-                .categories(categories)
-                .build();
-    }
-
-    private CategoryDTO mapToCategoryDTO(Category category) {
-        return CategoryDTO.builder()
-                .categoryId(category.getCategoryId())
-                .name(category.getName())
-                .build();
     }
 }
