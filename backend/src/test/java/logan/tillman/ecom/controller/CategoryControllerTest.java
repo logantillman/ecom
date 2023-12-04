@@ -27,7 +27,7 @@ public class CategoryControllerTest {
     @InjectMocks
     CategoryController categoryController;
 
-    CategoryDTO categoryDTO;
+    private CategoryDTO categoryDTO;
 
     @BeforeEach
     void setup() {
@@ -42,7 +42,7 @@ public class CategoryControllerTest {
     class GetAllCategoriesTests {
 
         @Test
-        @DisplayName("When categoryService returns a list, then send the list in a response entity")
+        @DisplayName("When categories are fetched, then send the list in an OK response")
         void getCategoriesTest() {
             when(categoryService.getAllCategories()).thenReturn(List.of(categoryDTO));
 
@@ -56,7 +56,7 @@ public class CategoryControllerTest {
         }
 
         @Test
-        @DisplayName("When categoryService returns an empty list, then return a bad request")
+        @DisplayName("When no categories are found, then send a NOT_FOUND response")
         void getCategoriesWithEmptyResponseTest() {
             when(categoryService.getAllCategories()).thenReturn(Collections.emptyList());
 
@@ -75,7 +75,7 @@ public class CategoryControllerTest {
     class CreateCategoryTests {
 
         @Test
-        @DisplayName("When categoryService returns the new category, then send it in a response entity")
+        @DisplayName("When a new category is created, then send the new category in an OK response")
         void createCategoryTest() {
             when(categoryService.createCategory(any(CategoryDTO.class))).thenReturn(categoryDTO);
 
@@ -89,7 +89,7 @@ public class CategoryControllerTest {
         }
 
         @Test
-        @DisplayName("When categoryService returns null, then return a bad request")
+        @DisplayName("When failing to create a new category, then send a BAD_REQUEST response")
         void createCategoryWithNullResponseTest() {
             when(categoryService.createCategory(any(CategoryDTO.class))).thenReturn(null);
 
@@ -108,7 +108,7 @@ public class CategoryControllerTest {
     class GetCategoryTests {
 
         @Test
-        @DisplayName("When categoryService returns the category, then send it in a response entity")
+        @DisplayName("When a category is fetched, then send it in an OK response")
         void getCategoryTest() {
             when(categoryService.getCategory(anyInt())).thenReturn(categoryDTO);
 
@@ -122,7 +122,7 @@ public class CategoryControllerTest {
         }
 
         @Test
-        @DisplayName("When categoryService returns null, then return not found")
+        @DisplayName("When the category is not found, then send a NOT_FOUND response")
         void getCategoryWithNullResponseTest() {
             when(categoryService.getCategory(anyInt())).thenReturn(null);
 
@@ -141,7 +141,7 @@ public class CategoryControllerTest {
     class UpdateCategoryTests {
 
         @Test
-        @DisplayName("When categoryService returns the updated category, then send it in a response entity")
+        @DisplayName("When a category is updated, then send the updated category in an OK response")
         void updateCategoryTest() {
             when(categoryService.updateCategory(anyInt(), any(CategoryDTO.class))).thenReturn(categoryDTO);
 
@@ -155,7 +155,7 @@ public class CategoryControllerTest {
         }
 
         @Test
-        @DisplayName("When categoryService returns null, then return a bad request")
+        @DisplayName("When a category fails to update, then return a BAD_REQUEST response")
         void updateCategoryWithNullResponseTest() {
             when(categoryService.updateCategory(anyInt(), any(CategoryDTO.class))).thenReturn(null);
 
