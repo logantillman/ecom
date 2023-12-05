@@ -34,10 +34,18 @@ public class ProductService {
             return null;
         }
 
+        var categoriesToFetch = productDTO.getCategories()
+                .stream()
+                .map(CategoryDTO::getCategoryId)
+                .collect(Collectors.toSet());
+
+        var categories = categoryRepository.findAllById(categoriesToFetch);
+
         var product = Product.builder()
                 .title(productDTO.getTitle())
                 .description(productDTO.getDescription())
                 .releaseDate(productDTO.getReleaseDate())
+                .categories(categories)
                 .build();
         return dtoMapper.mapToProductDTO(productRepository.saveAndFlush(product));
     }

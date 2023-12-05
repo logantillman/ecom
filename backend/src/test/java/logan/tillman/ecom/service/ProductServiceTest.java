@@ -12,6 +12,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -19,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,6 +43,9 @@ public class ProductServiceTest {
     @InjectMocks
     ProductService productService;
 
+    @Captor
+    ArgumentCaptor<Set<Integer>> integerListCaptor;
+
     private Product product;
     private ProductDTO productDTO;
     private Category category;
@@ -57,11 +63,13 @@ public class ProductServiceTest {
                 .name("Category name")
                 .build();
 
+        var currentDate = OffsetDateTime.now();
+
         product = Product.builder()
                 .title("Product title")
                 .productId(1)
                 .description("A good product")
-                .releaseDate(OffsetDateTime.now())
+                .releaseDate(currentDate)
                 .categories(List.of(category))
                 .build();
 
@@ -69,7 +77,7 @@ public class ProductServiceTest {
                 .title("Product title")
                 .productId(1)
                 .description("A good product")
-                .releaseDate(OffsetDateTime.now())
+                .releaseDate(currentDate)
                 .categories(List.of(categoryDTO))
                 .build();
     }
@@ -129,10 +137,10 @@ public class ProductServiceTest {
         @Test
         @DisplayName("When a product is created, then map it to the DTO")
         void createProductTest() {
-            product.setCategories(null);
-
             when(productRepository.saveAndFlush(any(Product.class))).thenReturn(product);
             when(dtoMapper.mapToProductDTO(any(Product.class))).thenCallRealMethod();
+            when(dtoMapper.mapToCategoryDTO(any(Category.class))).thenCallRealMethod();
+            when(categoryRepository.findAllById(anySet())).thenReturn(List.of(category));
 
             var createdProduct = productService.createProduct(productDTO);
 
@@ -140,12 +148,23 @@ public class ProductServiceTest {
             verifyNoMoreInteractions(productRepository);
 
             verify(dtoMapper, times(1)).mapToProductDTO(any(Product.class));
+            verify(dtoMapper, times(1)).mapToCategoryDTO(any(Category.class));
             verifyNoMoreInteractions(dtoMapper);
+
+            verify(categoryRepository, times(1)).findAllById(integerListCaptor.capture());
+            verifyNoMoreInteractions(categoryRepository);
+
+            assertThat(integerListCaptor.getValue())
+                    .containsOnly(categoryDTO.getCategoryId());
 
             assertThat(createdProduct)
                     .hasFieldOrPropertyWithValue("title", productDTO.getTitle())
                     .hasFieldOrPropertyWithValue("description", productDTO.getDescription())
-                    .hasFieldOrPropertyWithValue("releaseDate", productDTO.getReleaseDate());
+                    .hasFieldOrPropertyWithValue("releaseDate", productDTO.getReleaseDate())
+                    .extracting(ProductDTO::getCategories)
+                    .asList()
+                    .first()
+                    .isEqualTo(categoryDTO);
         }
 
         @Test
